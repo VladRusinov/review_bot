@@ -35,3 +35,16 @@ class EmptyAPIAnswerError(Exception):
 
     def __str__(self):
         return self.message
+
+
+class RequestError(Exception):
+    """Ошибка запроса."""
+
+    def __init__(self, message=None):
+        if message:
+            self.message = message
+        else:
+            self.message = "ошибка запроса"
+
+    def __str__(self):
+        return self.message

@@ -8,8 +8,12 @@ import requests
 import telegram
 from dotenv import load_dotenv
 
-from exceptions import (EmptyAPIAnswerError, InvalidStatusCodeError,
-                        NoEnvVarieblesError)
+from exceptions import (
+    EmptyAPIAnswerError,
+    InvalidStatusCodeError,
+    NoEnvVarieblesError,
+    RequestError
+)
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -68,39 +72,38 @@ def send_message(bot, message):
 
 def get_api_answer(timestamp):
     """Получение ответа от API."""
-    params = {'from_date': timestamp}
     REQUEST_DATA = {
-        'endpoint': ENDPOINT,
+        'url': ENDPOINT,
         'headers': HEADERS,
-        'params': params
+        'params': {'from_date': timestamp}
     }
     logger.debug(
-        'делаем запрос: адрес- {endpoint}, данные заголовка - {headers}, '
+        'делаем запрос: адрес- {url}, данные заголовка - {headers}, '
         'параметры - {params}'.format(**REQUEST_DATA)
     )
     try:
-        response = requests.get(
-            REQUEST_DATA['endpoint'],
-            params=REQUEST_DATA['params'],
-            headers=REQUEST_DATA['headers']
-        )
+        response = requests.get(**REQUEST_DATA)
         if response.status_code != HTTPStatus.OK:
             raise InvalidStatusCodeError()
         return response.json()
-    except requests.RequestException:
-        ...
+    except requests.exceptions.RequestException:
+        RequestError()
 
 
 def check_response(response):
     """Проверка ответа API."""
     logger.debug("Проверяем ответ сервара")
     if not isinstance(response, dict):
-        raise TypeError("type of response should be dict")
+        raise TypeError(
+            f"type of response should be dict, not {type(response)}"
+        )
     homeworks = response.get('homeworks')
     if homeworks is None:
         EmptyAPIAnswerError()
     if not isinstance(homeworks, list):
-        raise TypeError("type of 'homeworks' should be list")
+        raise TypeError(
+            f"type of 'homeworks' should be list, not {type(homeworks)}"
+        )
     return homeworks
 
 
@@ -118,23 +121,25 @@ def parse_status(homework):
 
 def main():
     """Основная логика работы бота."""
+    check_tokens()
     bot = telegram.Bot(token=TELEGRAM_TOKEN)
     timestamp = 0
-    check_tokens()
     old_status = None
     while True:
         try:
             answer = get_api_answer(timestamp)
             timestamp = answer.get('current_date', timestamp)
             homeworks = check_response(answer)
-            if len(homeworks) != 0:
-                new_status = parse_status(answer.get('homeworks')[0])
-                if old_status != new_status:
-                    send_message(bot, new_status)
-                    old_status = new_status
+            if homeworks:
+                new_status = parse_status(homeworks[0])
             else:
-                logger.debug('нет нового вердикта')
-        except (InvalidStatusCodeError, requests.RequestException) as error:
+                new_status = 'нет нового вердикта'
+                logger.debug(new_status)
+            if old_status != new_status:
+                send_message(bot, new_status)
+                old_status = new_status
+
+        except (InvalidStatusCodeError, RequestError) as error:
             message = f'Сбой в работе программы: {error}'
             logger.error(message)
         except (EmptyAPIAnswerError, KeyError, ValueError) as error:
