@@ -5,6 +5,6 @@
 
 ## как заполнить .env:
 ```
-PRACTICUM_TOKEN= ...
-TELEGRAM_TOKEN= ...
-TELEGRAM_CHAT_ID= ...
+PRACTICUM_TOKEN=ваш practicum token
+TELEGRAM_TOKEN=telegram token
+TELEGRAM_CHAT_ID=id чата
