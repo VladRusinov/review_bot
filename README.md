@@ -43,3 +43,9 @@ python3 homework.py
 PRACTICUM_TOKEN=ваш practicum token
 TELEGRAM_TOKEN=telegram token
 TELEGRAM_CHAT_ID=id чата
+```
+
+
+## Автор:
+
+Автор - Русинов Влад
