@@ -34,7 +34,7 @@ pip install -r requirements.txt
 Запустить бота:
 
 ```
-python homework.py
+python3 homework.py
 ```
 
 
