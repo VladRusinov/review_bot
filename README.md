@@ -1,13 +1,13 @@
 [![Typing SVG align="center"](https://readme-typing-svg.herokuapp.com?color=%2336BCF7&lines=REVIEW+BOT)](https://git.io/typing-svg)
 ## О проекте
-проект homework_bot реализует телеграм бота который отправляет сообщения с информацией о ревью проекта.
+проект review_bot реализует телеграм бота который отправляет сообщения с информацией о ревью проекта.
 
 ## Как запустить проект:
 
 Клонировать репозиторий и перейти в него в командной строке:
 
 ```
-git clone https://github.com/VladRusinov/homework_bot.git
+git clone https://github.com/VladRusinov/review_bot.git
 ```
 Cоздать и активировать виртуальное окружение:
 
